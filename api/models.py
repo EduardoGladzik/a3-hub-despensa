@@ -30,7 +30,7 @@ class Ingredient(models.Model):
     category = models.CharField(max_length=100, choices=STORAGE_CATEGORY)
 
     def __str__(self):
-        return f"{self.name} ({self.quantity} {self.measure_unit}) in {self.category}"
+        return f"{self.name}"
 
 class Storage(models.Model):
     name = models.CharField(max_length=255)
