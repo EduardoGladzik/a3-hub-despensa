@@ -24,9 +24,11 @@ class InvoiceViewSet(viewsets.ModelViewSet):
     serializer_class = InvoiceSerializer
     
     def perform_create(self, serializer):
+        """
+        Sobrescreve o método de criação para processar a nota fiscal em uma thread separada."""
         # salva nota fiscal
         invoice = serializer.save()
 
         # processa a nota fiscal em uma thread separada
-        thread = threading.Thread(target=process_invoice, args=(invoice,))
+        thread = threading.Thread(target=process_invoice, args=(invoice.id,))
         thread.start()
