@@ -1,6 +1,14 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 
+UNIT_CATEGORY = [
+    ('UN', 'Units'),
+    ('KG', 'Kilograms'),
+    ('G', 'Grams'),
+    ('L', 'Liters'),
+    ('ML', 'Milliliters'),
+]
+
 class User(AbstractBaseUser):
     username = models.CharField(max_length=255)
     email = models.EmailField(unique=True)
@@ -11,25 +19,8 @@ class User(AbstractBaseUser):
         return self.username
 
 class Ingredient(models.Model):
-
-    STORAGE_CATEGORY = [
-        ('fridge', 'Fridge'),
-        ('freezer', 'Freezer'),
-        ('pantry', 'Pantry'),
-    ]
-
-    UNIT_CATEGORY = [
-        ('kg', 'Kilograms'),
-        ('g', 'Grams'),
-        ('l', 'Liters'),
-        ('ml', 'Milliliters'),
-        ('unit', 'Units'),
-        ('other', 'Other'),
-    ]
-
     name = models.CharField(max_length=255)
     measure_unit = models.CharField(max_length=100, choices=UNIT_CATEGORY)
-    category = models.CharField(max_length=100, choices=STORAGE_CATEGORY)
 
     def __str__(self):
         return f"{self.name}"
