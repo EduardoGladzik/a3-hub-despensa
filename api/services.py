@@ -35,28 +35,16 @@ def extract_quantity(text_line):
     """
     Extrai a quantidade de um item a partir de uma linha de texto.
     """
-    # Remove números que possam ser códigos de barras ou outros identificadores longos
-    text_without_barcodes = re.sub(r'\d{5,}', '', text_line)
-
     # Procura por um número seguido de "UN"
-    match = re.search(r'(\d+)\s*(UN)?', text_line, re.IGNORECASE)
+    match = re.search(r'(\d+)\s*(UN)', text_line, re.IGNORECASE)
     if match:
         return float(match.group(1))
-
-    # Busca por todos os números na linha, ignorando aqueles que parecem ser códigos de barras
-    numbers = re.findall(r'\d+', text_without_barcodes)
-
-    # Busca o primeiro número que seja maior que 0 e menor que 100
-    for num_str in numbers:
-        val = float(num_str)
-        if 0 < val < 100:
-            return val
     
     # Fallback: se nenhum número válido for encontrado, retorna 1.0 como quantidade padrão
-    return 1.0
+    return 7.0
 
 
-def match_ingredients(extracted_text, ingredient_names, threshold=75.0):
+def match_ingredients(extracted_text, ingredient_names, threshold=77.0):
     """
     Retorna uma lista de dicionários contendo os ingredientes encontrados e suas quantidades
     """
@@ -71,8 +59,10 @@ def match_ingredients(extracted_text, ingredient_names, threshold=75.0):
     normalized_catalog = [ing.lower() for ing in ingredient_names]
 
     lines = extracted_text.split('\n')
-    
-    for line in lines:
+
+    last_matched_ingredient = None
+
+    for i, line in enumerate(lines):
         line_raw = line.strip()
         if not line_raw:
             continue
@@ -99,8 +89,15 @@ def match_ingredients(extracted_text, ingredient_names, threshold=75.0):
             score = match[1]
 
             if score >= threshold:
-                quantity = extract_quantity(line_clean)
                 original_db_name = catalog_mapping[best_match_name]
+
+                if original_db_name == last_matched_ingredient:
+                    continue
+                
+                context_lines = lines[i + 1 : i + 3] # Pega as próximas 2 linhas como contexto para extração de quantidade  
+                context_text = " ".join(context_lines)
+                print (f"Contexto para extração de quantidade: '{context_text}'")
+                quantity = extract_quantity(context_text)
 
                 print(f"MATCH ENCONTRADO: OCR('{line_clean}') == BANCO('{original_db_name}') | Score: {score:.2f} | Qtd: {quantity}")
 
