@@ -5,6 +5,8 @@ class User(AbstractBaseUser):
     username = models.CharField(max_length=255)
     email = models.EmailField(unique=True)
 
+    USERNAME_FIELD = 'username'
+
     def __str__(self):
         return self.username
 
