@@ -35,13 +35,20 @@ def extract_quantity(text_line):
     """
     Extrai a quantidade de um item a partir de uma linha de texto.
     """
+    # remove números longos que provavelmente são códigos de barras
+    text_line = re.sub(r'\d{5,}', '', text_line) 
+    text_lower = text_line.lower()
+     # substitui por '1 un' alucinações onde o 1 é lido como y, i, j ou l
+    text_lower = re.sub(r'\b[ylij]un\b', '1 un', text_lower)
+    # substitui por 'X un' alucinações onde o número é seguido por u e possivelmente um x, 8 ou letra
+    text_lower = re.sub(r'(\d+)u[x8a-z]?\b', r'\g<1> un', text_lower)
     # Procura por um número seguido de "UN"
-    match = re.search(r'(\d+)\s*(UN)', text_line, re.IGNORECASE)
+    match = re.search(r'(\d+)[^a-z0-9]*(un|und|unid|um)', text_lower)
     if match:
         return float(match.group(1))
     
-    # Fallback: se nenhum número válido for encontrado, retorna 1.0 como quantidade padrão
-    return 7.0
+    # Fallback
+    return 1.0
 
 
 def match_ingredients(extracted_text, ingredient_names, threshold=77.0):
@@ -94,12 +101,9 @@ def match_ingredients(extracted_text, ingredient_names, threshold=77.0):
                 if original_db_name == last_matched_ingredient:
                     continue
                 
-                context_lines = lines[i + 1 : i + 3] # Pega as próximas 2 linhas como contexto para extração de quantidade  
+                context_lines = lines[i : i + 3] # pega a linha atual e as próximas 2 linhas para contexto  
                 context_text = " ".join(context_lines)
-                print (f"Contexto para extração de quantidade: '{context_text}'")
                 quantity = extract_quantity(context_text)
-
-                print(f"MATCH ENCONTRADO: OCR('{line_clean}') == BANCO('{original_db_name}') | Score: {score:.2f} | Qtd: {quantity}")
 
                 matched_items.append({
                     "name": original_db_name,
