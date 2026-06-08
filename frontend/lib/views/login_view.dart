@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'home_view.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -29,7 +30,7 @@ class _LoginViewState extends State<LoginView> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Login realizado com sucesso!')),
       );
-      // Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomeView()));
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomeView()));
     }
   }
 
