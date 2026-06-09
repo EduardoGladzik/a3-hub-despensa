@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'scanner_view.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -32,10 +33,7 @@ class HomeView extends StatelessWidget {
               subtitle: 'Use a câmera para escanear uma nota fiscal e extrair os dados automaticamente.',
               color: Colors.blueAccent,
               onTap: () {
-                // navegação para tela de escaneamento
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Navegando para a tela de escaneamento...'))
-                );
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const ScannerView()));
               },
             ),
             SizedBox(height: 16.0),
