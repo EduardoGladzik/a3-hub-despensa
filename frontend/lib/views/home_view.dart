@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'scanner_view.dart';
+import 'storage_view.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -44,10 +45,7 @@ class HomeView extends StatelessWidget {
               subtitle: 'Gerencie suas despensas.',
               color: Colors.orangeAccent,
               onTap: () {
-                // navegação para tela de despensas
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Navegando para a tela de despensas...'))
-                );
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const StorageView()));
               },
             ),
           ],
