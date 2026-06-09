@@ -27,9 +27,6 @@ class _LoginViewState extends State<LoginView> {
 
     // Roteamento para a home após login
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Login realizado com sucesso!')),
-      );
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomeView()));
     }
   }
