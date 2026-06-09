@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/views/storage_view.dart';
 
 class LoadingView extends StatefulWidget {
   const LoadingView({super.key});
@@ -24,7 +25,7 @@ class _LoadingViewState extends State<LoadingView> {
       );
       // Futuramente roteamento para despensa
       //Teste temporário
-      Navigator.pop(context);
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const StorageView()));
     }
   }
 
