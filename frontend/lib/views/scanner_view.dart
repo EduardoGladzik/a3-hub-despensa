@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
+import 'loading_view.dart';
 
 class ScannerView extends StatefulWidget {
   const ScannerView({super.key});
@@ -46,26 +47,34 @@ class _ScannerViewState extends State<ScannerView> {
   Future<void> _uploadInvoice() async {
     if (_image == null) return;
 
+    // Roteia o usuário para a tela de carregamento
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const LoadingView())
+    );
+
+    // Código do HTTP será acoplado aqui no futuro
+
     // url do backend
-    var uri = Uri.parse('http://10.0.2.2:8000/api/invoices/');
-    var request = http.MultipartRequest('POST', uri);
-    request.files.add(await http.MultipartFile.fromPath('img_captured', _image!.path));
+    //var uri = Uri.parse('http://10.0.2.2:8000/api/invoices/');
+    //var request = http.MultipartRequest('POST', uri);
+    //request.files.add(await http.MultipartFile.fromPath('img_captured', _image!.path));
 
     // valores fixos backend
-    request.fields['user'] = '1';
-    request.fields['destined_storage'] = '1';
+    //request.fields['user'] = '1';
+    //request.fields['destined_storage'] = '1';
 
-    var response = await request.send();
-    if (response.statusCode == 201) {
-      if(mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Upload realizado com sucesso!')));
-    }
+    //var response = await request.send();
+    //if (response.statusCode == 201) {
+    //  if(mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Upload realizado com sucesso!')));
+     //}
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Escanear Nota")),
-      body: Row(
+      body: Column(
         children: [
           Expanded(child: _image == null ? const Icon(Icons.camera_alt, size: 100) : Image.file(_image!)),
           ElevatedButton(onPressed: _pickImageCamera, child: const Text("Escanear Imagem")),
