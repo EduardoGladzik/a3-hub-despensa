@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-//import 'package:http/http.dart' as http;
 import 'loading_view.dart';
 
 class ScannerView extends StatefulWidget {
@@ -45,29 +44,21 @@ class _ScannerViewState extends State<ScannerView> {
 
 
   Future<void> _uploadInvoice() async {
-    if (_image == null) return;
-
+    // se _image estiver vazio o método é interrompido
+    if (_image == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Tire uma foto ou selecione um imagem na galeria antes de enviar.')),
+      );
+      return;
+    } 
+    
     // Roteia o usuário para a tela de carregamento
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (_) => const LoadingView())
+      MaterialPageRoute(
+        builder: (context) => LoadingView(imageFile: _image!),
+      ),
     );
-
-    // Código do HTTP será acoplado aqui no futuro
-
-    // url do backend
-    //var uri = Uri.parse('http://10.0.2.2:8000/api/invoices/');
-    //var request = http.MultipartRequest('POST', uri);
-    //request.files.add(await http.MultipartFile.fromPath('img_captured', _image!.path));
-
-    // valores fixos backend
-    //request.fields['user'] = '1';
-    //request.fields['destined_storage'] = '1';
-
-    //var response = await request.send();
-    //if (response.statusCode == 201) {
-    //  if(mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Upload realizado com sucesso!')));
-     //}
   }
 
   @override

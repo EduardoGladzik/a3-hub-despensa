@@ -1,31 +1,40 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:frontend/views/storage_view.dart';
+import '../services/api_service.dart';
 
 class LoadingView extends StatefulWidget {
-  const LoadingView({super.key});
+  // exige a imagem da nota
+  final File imageFile;
+  const LoadingView({super.key, required this.imageFile});
 
   @override
   State<LoadingView> createState() => _LoadingViewState();
 }
 
 class _LoadingViewState extends State<LoadingView> {
+  String _statusMessage = 'Enviando imagem...';
+  
   @override
   void initState() {
     super.initState();
-    _waitForProcessing();
+    _processInvoice();
   }
 
-  Future<void> _waitForProcessing() async {
-    // simulação do tempo de processamento
-    await Future.delayed(const Duration(seconds: 4));
+  Future<void> _processInvoice() async {
+    ApiService apiService = ApiService();
+    bool success = await apiService.uploadInvoice(widget.imageFile);
 
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Nota processada com sucesso!')),
-      );
-      // Futuramente roteamento para despensa
-      //Teste temporário
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const StorageView()));
+    if (success) {
+      setState(() {
+        _statusMessage = 'Sucesso no processamento da nota.';
+      });
+      // routing para StorageView
+    } else {
+      setState(() {
+        _statusMessage = 'Erro no processamento. Tente novamente.';
+      });
+      await Future.delayed(const Duration(seconds: 2));
+      if (mounted) Navigator.pop(context);
     }
   }
 
@@ -36,24 +45,12 @@ class _LoadingViewState extends State<LoadingView> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            CircularProgressIndicator(color: Colors.white),
-            SizedBox(height: 32),
+          children: [
+            const CircularProgressIndicator(color: Colors.white),
+            const SizedBox(height: 32),
             Text(
-              "Analisando a nota fiscal...",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 22,
-                fontWeight: FontWeight.bold
-              ),
-            ),
-            SizedBox(height: 12),
-            Text(
-              "Extraindo os produtos para sua despensa.",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white70,
-                fontSize: 16
+              _statusMessage,
+              style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold
               ),
             ),
           ],
