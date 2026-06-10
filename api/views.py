@@ -28,7 +28,7 @@ class StorageViewSet(viewsets.ModelViewSet):
         """
         storage = self.get_object()
         storage_items = StorageIngredient.objects.filter(storage=storage)
-        serializer = StorageIngredientSerialzer(storage_items, many=True)
+        serializer = StorageIngredientSerializer(storage_items, many=True)
         return Response(serializer.data)
 
 class InvoiceViewSet(viewsets.ModelViewSet):
