@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:frontend/views/storage_view.dart';
 import '../services/api_service.dart';
 
 class LoadingView extends StatefulWidget {
@@ -35,6 +36,12 @@ class _LoadingViewState extends State<LoadingView> {
       });
       await Future.delayed(const Duration(seconds: 2));
       if (mounted) Navigator.pop(context);
+    }
+    
+    await Future.delayed(const Duration(seconds: 2));
+
+    if (mounted) {
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const StorageView()));
     }
   }
 
