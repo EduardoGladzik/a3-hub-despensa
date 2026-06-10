@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/api_service.dart';
 
 class StorageView extends StatefulWidget {
   const StorageView({super.key});
@@ -8,36 +9,13 @@ class StorageView extends StatefulWidget {
 }
 
 class _StorageViewState extends State<StorageView> {
-  bool _isLoading = true;
-  List<Map<String, dynamic>> _pantryItems = [];
+  final ApiService _apiService = ApiService();
+  late Future<List<dynamic>> _storageItems;
 
   @override
   void initState() {
     super.initState();
-    _fetchPantryItems();
-  }
-
-  Future<void> _fetchPantryItems() async {
-    // Requisição ao django
-    // final response = await http.get(Uri.parse(''));
-    // if (response.statusCode == 200) { converter JSON e atualizar o estado}
-
-    // simulação do tempo de resposta
-    await Future.delayed(const Duration(seconds: 2));
-
-    if (mounted) {
-      setState(() {
-        // Dados simulados
-        _pantryItems = [
-          {'name': 'Arroz Tio João', 'quantity': 5.0, 'unit': 'KG'},
-          {'name': 'Feijão Carioca', 'quantity': 2.0, 'unit': 'KG'},
-          {'name': 'Óleo de Soja', 'quantity': 1.0, 'unit': 'UN'},
-          {'name': 'Macarrão Espaguete', 'quantity': 3.0, 'unit': 'UN'},
-          {'name': 'Molho de Tomate', 'quantity': 2.0, 'unit': 'UN'},
-        ];
-        _isLoading = false;
-      });
-    }
+    _storageItems = _apiService.getStorageItems();
   }
 
   @override
@@ -45,53 +23,64 @@ class _StorageViewState extends State<StorageView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Minha Despensa'),
-        backgroundColor: Colors.orangeAccent,
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.green,
       ),
-      backgroundColor: Colors.grey[100],
-      body: _isLoading
-        ? const Center(child: CircularProgressIndicator(color: Colors.orangeAccent))
-        : _pantryItems.isEmpty 
-        ? const Center(
-          child: Text(
-            'Sua despensa está vazia.',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 18, color: Colors.grey),
-          ),
-        )
-      : ListView.builder(
-          padding: const EdgeInsets.all(16.0),
-          itemCount: _pantryItems.length,
-          itemBuilder: (context, index) {
-            final item = _pantryItems[index];
-            return Card(
-              elevation: 2,
-              margin: const EdgeInsets.only(bottom: 12.0),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                leading: CircleAvatar(
-                  backgroundColor: Colors.orange[100],
-                  child: const Icon(Icons.kitchen, color: Colors.orange),
-                ),
-                title: Text(
-                  item['name'],
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)
-                ),
-                trailing: Text(
-                  '${item['quantity']} ${item['unit']}',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w900,
-                    color: Colors.green,
-                  ),
-                ),
-              ),
+      body: FutureBuilder<List<dynamic>>(
+        future: _storageItems,
+        builder: (context, snapshot) {
+          // estado de carregamento
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          // Estado de erro
+          else if (snapshot.hasError) {
+            return Center(child: Text('Erro ao carregar a despensa: ${snapshot.error}'));
+          }
+
+          // Estado de sucesso, mas vazio
+          else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(
+              child: Text(
+                'A sua depensa está vazia',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 18),
+              )
             );
-          },
-        ),
+          }
+
+          // estado de sucesso com dados
+          List<dynamic> items = snapshot.data!;
+          return ListView.builder(
+            itemCount: items.length,
+            itemBuilder: (context, index) {
+              var item = items[index];
+
+              String name = item['ingredient']['name'] ?? 'Produto desconhecido';
+              String quantity = item['current_quantity']?.toString() ?? '1';
+              String unit = item['ingredient']['measure_unit']  ?? 'UN';
+
+              return Card(
+                margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                elevation: 2,
+                child: ListTile(
+                  leading: const Icon(Icons.fastfood, color: Colors.orange),
+                  title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  subtitle: Text('Quantidade: $quantity $unit'),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete_outline, color: Colors.red),
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Funcionalidade a caminho...')),
+                      );
+                    }
+                  )
+                )
+              );
+            }
+          );
+        }
+      )
     );
   }
 }
