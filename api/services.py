@@ -174,7 +174,7 @@ def process_invoice(invoice_id):
         invoice = Invoice.objects.get(id=invoice_id)
 
         # lê a imagem (OCR)
-        img_path = invoice.img_captured.path
+        img_path = invoice.img_captured.read()
         result = reader.readtext(img_path, detail=0)
         extracted_text = "\n".join(result)
 
